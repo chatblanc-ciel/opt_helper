@@ -34,6 +34,7 @@ protected:
     double value;                               //最良評価値
     vector<double> update_value;
     vector<double> variable;                    //最良評価値の時の変数
+    vector<double> variable_first;              //開始時の最良評価値の変数
     vector<vector<double>> update_variable;
     double evals;                               //評価回数
     clock_t time;                               //1試行あたりの最適化の実行時間
@@ -58,6 +59,12 @@ public:
     Result& set_variable(vector<double> input)
     { 
         variable = input;
+        return *this; 
+    }  
+
+    Result& set_variable_first(vector<double> input)
+    { 
+        variable_first = input;
         return *this; 
     }  
 
@@ -97,6 +104,8 @@ public:
     { return update_value; }
     vector<double> get_variable() const
     { return variable; }
+    vector<double> get_variable_first() const
+    { return variable_first; }
     vector<vector<double>> get_update_variable() const
     { return update_variable; }   
     double get_evals() const
@@ -108,10 +117,14 @@ public:
 
     void tprint_update_curve(const string&) const;
     void gprint_update_curve(const string&, const bool) const; 
+    void tprint_update_variable(const string&) const;  
+    void tprint_variable(const string&) const;
+    void tprint_variable_first(const string&) const;
 
     //static function
 
     static void tprint_all_result(const vector<Result>& ,const string&);
+    static void tprint_all_variables(const vector<Result>& ,const string&);
     
 };
 
@@ -137,7 +150,6 @@ public:
     { return ave; }
     double variance() const
     { return var; }
-    double std_deviation() const
     { return std_dev; }
     double maximum() const
     { return max; }

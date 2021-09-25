@@ -29,7 +29,6 @@ void Result::tprint_update_curve(const string& file_name) const
     fclose(csv);
 }
 
-
 /*
  * 更新曲線 画像出力
  *
@@ -44,7 +43,7 @@ void Result::gprint_update_curve(const string& file_name, bool logscale) const
     fprintf(gp, "set output '%s'\n" ,file_name.c_str());
     fprintf(gp, "set grid\n");
     fprintf(gp, "set xlabel 'Number of evaluations'\n");
-    fprintf(gp, "set ylabel 'Objective function value'\n");
+    fprintf(gp, "set ylabel 'objective function value'\n");
     fprintf(gp, "set key    font 'Times New Roman,10'\n");
     fprintf(gp, "set xlabel font 'Times New Roman,12'\n");
     fprintf(gp, "set ylabel font 'Times New Roman,12'\n");
@@ -67,6 +66,92 @@ void Result::gprint_update_curve(const string& file_name, bool logscale) const
 }
 
 /*
+ * 変数の更新経歴
+ * 
+ * tprint_update_variable(ファイルの名前を拡張子込みで入力)
+ * 
+ */ 
+void Result::tprint_update_variable(const string& file_name) const
+{
+    FILE *csv = fopen(file_name.c_str(),"w");
+
+    fprintf(csv, "No,");
+
+    for(unsigned int i = 0; i < update_variable.at(i).size(); i++)
+    {
+        fprintf(csv, "Variable[%d],",i);
+    }
+
+    fprintf(csv, "\n");
+
+    for(unsigned int i = 0; i < update_variable.size(); i++)
+    {
+        fprintf(csv, "%d,",i + 1);
+        for (unsigned int j = 0; j < update_variable.at(i).size() - 1; j++)
+        {
+            fprintf(csv, "%.15f,",update_variable.at(i).at(j));
+        }
+
+        fprintf(csv, "%.15f\n" ,update_variable.at(i).back());
+    }
+    fclose(csv);
+}
+
+/*
+ * 最良変数
+ * 1試行のなかで最も評価値が良かった時の変数の値を示す。
+ * 
+ * tprint_variables(ファイルの名前を拡張子込みで入力)
+ */
+void Result::tprint_variable(const string& file_name) const
+{
+    FILE *csv = fopen(file_name.c_str(),"w");
+
+    for(unsigned int i = 0; i < variable.size(); i++)
+    {
+        fprintf(csv, "Variable[%d],",i);
+    }
+
+    fprintf(csv, "\n");
+
+    for (unsigned int i = 0; i < variable.size() - 1 ; i++)
+    {
+        fprintf(csv, "%.15f,",variable.at(i));
+    }
+
+    fprintf(csv, "%.15f" ,variable.back());
+
+    fclose(csv);
+}
+
+/*
+ * 開始時の最良変数
+ * 1試行の開始時で最も評価値が良かった時の変数の値を示す。
+ * 
+ * tprint_variables_first(ファイルの名前を拡張子込みで入力)
+ */
+void Result::tprint_variable_first(const string& file_name) const
+{
+    FILE *csv = fopen(file_name.c_str(),"w");
+
+    for(unsigned int i = 0; i < variable_first.size(); i++)
+    {
+        fprintf(csv, "Variable[%d],",i);
+    }
+
+    fprintf(csv, "\n");
+
+    for (unsigned int i = 0; i < variable_first.size() - 1 ; i++)
+    {
+        fprintf(csv, "%.15f,",variable_first.at(i));
+    }
+
+    fprintf(csv, "%.15f" ,variable_first.back());
+
+    fclose(csv);
+}
+
+/*
  *  全出力用関数 
  *  No,Value,Evals,Iter,Time
  *  結果をまとめる関数
@@ -81,10 +166,44 @@ void Result::tprint_all_result(const vector<Result>& results ,const string& file
 
     for(unsigned int i = 0; i < results.size(); i++)
     {
-        fprintf(csv, "%d,%.15f,%.15f,%lld,%.15f\n",
-            i + 1, results.at(i).get_value(), results.at(i).get_evals(),
-            results.at(i).get_iter(), (double)results.at(i).get_time());
+        fprintf(csv, "%d,%.15f,%.15f,%.15d,%.15f\n"
+        ,i + 1 ,results.at(i).get_value() ,results.at(i).get_evals() 
+        ,results.at(i).get_iter() ,(double)results.at(i).get_time());
     }
+    fclose(csv);
+}
+
+/*
+ *  全試行分の最良値の変数をまとめる関数 
+ *  No,variables
+ *  結果をまとめる関数
+ *  
+ *  tprint_all_variables(全試行分の結果の配列)
+ */
+void Result::tprint_all_variables(const vector<Result>& results ,const string& file_name)
+{
+    FILE *csv = fopen(file_name.c_str(),"w");
+
+    fprintf(csv, "No,");
+
+    for(unsigned int i = 0; i < results.at(0).get_variable().size(); i++)
+    {
+        fprintf(csv, "Variable[%d],",i);
+    }
+
+    fprintf(csv, "\n");
+
+    for(unsigned int i = 0; i < results.size(); i++)
+    {
+        fprintf(csv, "%d,",i + 1);
+        for (unsigned int j = 0; j < results.at(i).get_variable().size() - 1 ; j++)
+        {
+            fprintf(csv, "%.15f,",results.at(i).get_variable().at(j));
+        }
+
+        fprintf(csv, "%.15f\n" ,results.at(i).get_variable().back());
+    }
+    
     fclose(csv);
 }
 

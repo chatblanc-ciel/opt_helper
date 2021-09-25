@@ -17,7 +17,8 @@ using namespace std;
 void test_Statistics_Welfords_online_algorithm();
 void test_tprint_update_curve();
 void test_tprint_update_variable();  
-void test_tprint_variables();
+void test_tprint_variable();
+void test_tprint_variable_first();
 void test_gprint_update_curve(); 
 void test_tprint_all_result();
 void test_tprint_all_variables();
@@ -29,11 +30,12 @@ int main(void)
 
 	test_tprint_update_curve();
 	//test_tprint_update_variable();
-	//test_tprint_variables();
-	test_gprint_update_curve();	//対数がうまく取れません、それ以外はうまくいっていると思います
-	test_tprint_all_result();
+	//test_tprint_variable();
+	//test_tprint_variable_first();
+	//test_gprint_update_curve();
+	//test_tprint_all_result();
 	//test_tprint_all_variables();
-	test_tprint_all_statistics();
+	//test_tprint_all_statistics();
 
 	return 0;
 }
@@ -126,6 +128,52 @@ void test_tprint_update_curve()
 
 }
 
+void test_tprint_update_variable()
+{
+	vector<vector<double>> test;
+	test.resize(20);
+
+	for(unsigned int i = 0; i < 20; i++)
+	{
+		for(unsigned int j = 0; j < 10; j++)
+		{
+			test.at(i).emplace_back(j);
+		}
+	}
+
+	Result update_variable(Result().set_update_variable(test));
+
+	update_variable.tprint_update_variable("test_update_variable.csv");
+}
+
+void test_tprint_variable()
+{
+	vector<double> test;
+
+	for(unsigned int i = 0; i < 20; i++)
+	{
+			test.emplace_back(i);
+	}
+
+	Result variable(Result().set_variable(test));
+
+	variable.tprint_variable("test_variable.csv");
+}
+
+void test_tprint_variable_first()
+{
+	vector<double> test;
+
+	for(unsigned int i = 0; i < 20; i++)
+	{
+			test.emplace_back(i);
+	}
+
+	Result variable(Result().set_variable_first(test));
+
+	variable.tprint_variable_first("test_variable_first.csv");
+}
+
 void test_gprint_update_curve()
 {
 	vector<double> test;
@@ -171,6 +219,27 @@ void test_tprint_all_result()
 	};
 
 	Result::tprint_all_result(results, "all_result.csv");
+}
+
+void test_tprint_all_variables()
+{
+	vector<double> test;
+
+	for(unsigned int i = 0; i < 20; i++)
+	{
+			test.emplace_back(i);
+	}
+
+	vector<Result> variable
+	{
+		Result().set_variable(test),
+		Result().set_variable(test),
+		Result().set_variable(test),
+		Result().set_variable(test),
+		Result().set_variable(test)
+	};
+
+	Result::tprint_all_variables(variable, "all_variables.csv");
 }
 
 void test_tprint_all_statistics()
