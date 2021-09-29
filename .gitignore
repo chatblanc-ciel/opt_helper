@@ -1,4 +1,5 @@
 *.exe
+*.png
 Debug
 Release
 .cproject

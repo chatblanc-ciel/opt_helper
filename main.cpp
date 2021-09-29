@@ -1,5 +1,5 @@
 /*
- * Result.cpp
+ * main.cpp
  *
  *  Created on: 2021/10/02
  *      Author: hommyo
@@ -12,16 +12,28 @@
 #include <chrono>
 #include <assert.h>
 #include <numeric>
-
 using namespace std;
 
 void test_Statistics_Welfords_online_algorithm();
+void test_tprint_update_curve();
+void test_tprint_update_variable();  
+void test_tprint_variables();
+void test_gprint_update_curve(); 
+void test_tprint_all_result();
+void test_tprint_all_variables();
+void test_tprint_all_statistics();
 
 int main(void)
 {
 	printf("example run\n");fflush(0);
 
-	test_Statistics_Welfords_online_algorithm();
+	test_tprint_update_curve();
+	//test_tprint_update_variable();
+	//test_tprint_variables();
+	test_gprint_update_curve();	//対数がうまく取れません、それ以外はうまくいっていると思います
+	test_tprint_all_result();
+	//test_tprint_all_variables();
+	test_tprint_all_statistics();
 
 	return 0;
 }
@@ -96,4 +108,106 @@ void test_Statistics_Welfords_online_algorithm()
 	assert(std::round(max*acc) == std::round(max2*acc));
 	assert(std::round(min*acc) == std::round(min2*acc));
 
+}
+
+void test_tprint_update_curve()
+{
+	vector<double> test;
+
+	for(unsigned int i = 1; i < 1000; i++)
+	{
+		double t = i * 0.01;
+		test.emplace_back(t);
+	}
+
+	Result update_value(Result().set_update_value(test));
+
+	update_value.tprint_update_curve("test_update_curve.csv");
+
+}
+
+void test_gprint_update_curve()
+{
+	vector<double> test;
+
+	for(unsigned int i = 1; i < 20; i ++)
+	{
+		double t = i * 0.01;
+		test.emplace_back(t);
+	}
+
+	Result update_value(Result().set_update_value(test));
+
+	update_value.gprint_update_curve("test_update_curve.png", true);
+
+}
+
+void test_tprint_all_result()
+{
+	double value = 1.0;
+	double evals = 30.0;
+	unsigned int iter = 500;
+	clock_t time = 200;
+
+	vector<Result> results
+	{
+		Result()
+		.set_value(value)
+		.set_evals(evals)
+		.set_iter(iter)
+		.set_time(time),
+
+		Result()
+		.set_value(value)
+		.set_evals(evals)
+		.set_iter(iter)
+		.set_time(time),	
+
+		Result()
+		.set_value(value)
+		.set_evals(evals)
+		.set_iter(iter)
+		.set_time(time),	
+	};
+
+	Result::tprint_all_result(results, "all_result.csv");
+}
+
+void test_tprint_all_statistics()
+{
+	vector<Result> results1
+	{
+		Result().set_value(0.6).set_evals(4000.0).set_time((clock_t)2000),
+		Result().set_value(0.8).set_evals(5000.0).set_time((clock_t)3000),
+		Result().set_value(1.0).set_evals(6000.0).set_time((clock_t)4000),
+		Result().set_value(1.2).set_evals(7000.0).set_time((clock_t)5000),
+		Result().set_value(1.4).set_evals(8000.0).set_time((clock_t)6000),
+    };
+
+		vector<Result> results2
+	{
+		Result().set_value(1.6).set_evals(2000.0).set_time((clock_t)3000),
+		Result().set_value(1.8).set_evals(3000.0).set_time((clock_t)4000),
+		Result().set_value(2.0).set_evals(4000.0).set_time((clock_t)5000),
+		Result().set_value(2.2).set_evals(5000.0).set_time((clock_t)6000),
+		Result().set_value(2.4).set_evals(6000.0).set_time((clock_t)7000),
+    };
+
+		vector<Result> results3
+	{
+		Result().set_value(2.6).set_evals(5000.0).set_time((clock_t)1000),
+		Result().set_value(2.8).set_evals(6000.0).set_time((clock_t)2000),
+		Result().set_value(3.0).set_evals(7000.0).set_time((clock_t)3000),
+		Result().set_value(3.2).set_evals(8000.0).set_time((clock_t)4000),
+		Result().set_value(3.4).set_evals(9000.0).set_time((clock_t)5000),
+    };
+
+	vector<Statistics> st 
+	{
+		Statistics(results1),
+		Statistics(results2),
+		Statistics(results3),		
+	};
+
+	Statistics::tprint_all_statistics(st, "all_statistics.csv");
 }
