@@ -11,6 +11,7 @@
 #include <string>
 #include <chrono>
 #include <assert.h>
+#include <numeric>
 
 using namespace std;
 
@@ -18,7 +19,7 @@ void test_Statistics_Welfords_online_algorithm();
 
 int main(void)
 {
-	printf("example run\n");
+	printf("example run\n");fflush(0);
 
 	test_Statistics_Welfords_online_algorithm();
 
@@ -27,11 +28,11 @@ int main(void)
 
 /* # 基本統計量構造体
  *   基本統計量計算のテスト
- *
+ *   定義通りの計算と構造体のメソッドによる
+ *   基本統計量の計算が一致するか検査する
  */
 void test_Statistics_Welfords_online_algorithm()
 {
-	//Statistics関数使用時のテスト
 	vector<Result> results1
 	{
 		Result().set_value(0.6),
@@ -41,6 +42,7 @@ void test_Statistics_Welfords_online_algorithm()
 		Result().set_value(1.4),
     };
 
+	//Statistics関数使用時の数値
 	auto st = Statistics(results1);
 
 	double ave = st.average();
@@ -49,57 +51,49 @@ void test_Statistics_Welfords_online_algorithm()
 	double max = st.maximum();
 	double min = st.minimum();
 
-	printf("ave=%f var=%f std_dev=%f max=%f min=%f\n\n" ,ave ,var ,std_dev ,max ,min);
+	printf("Struct Statistics by Welford online algorithm\n");
+	printf("ave=%.15f var=%.15f std_dev=%.15f max=%.15f min=%.15f\n\n" ,ave ,var ,std_dev ,max ,min);
 
+	//定義通りに計算した場合の数値
+	//average計算
+	double ave2 = std::accumulate(results1.begin(), results1.end(), 0.0,
+		[](double sum, const auto& result)
+		{ return sum + result.get_value(); })
+		/ results1.size();
 
-
-	double ave2 = 0.0;
-	double var2 = 0.0;
-	double std_dev2 = 0.0;
-	double max2 = 0.0;
-	double min2 = 0.0;
-
-    unsigned int results_len = results1.size();
-   
-   //average,variance計算
-    for(unsigned int i = 0; i < results_len; ++i)
-    {
-        double value = results1.at(i).get_value();
-
-        ave2 += value;
-        var2 += value * value;	
-	}
-		ave2 /= results_len;
-    	var2 = var2 / results_len - ave2 * ave2;
+	//variance計算
+	double var2 = std::accumulate(results1.begin(), results1.end(), 0.0,
+		[ave](double sum, const auto& result)
+		{
+			const auto temp = result.get_value() - ave;
+			return sum + temp * temp;
+		})
+		/ results1.size();
 
 	//standard_deviation 計算
-        std_dev2 = sqrt(var2);
-		
-	for(unsigned int i = 0; i < results_len; ++i)
-    {
+	double std_dev2 = sqrt(var2);
 
-		double value = results1.at(i).get_value();
+	//maximum 計算
+	double max2 = (*std::max_element(results1.begin(), results1.end(),
+		[](const auto& a, const auto& b)
+		{ return a.get_value() < b.get_value(); }))
+		.get_value();
 
-    //maximum 計算
-        if( i==0 || max2 < value )
-        {
-            max2 = value;
-        }
+	//minimum 計算
+	double min2 = (*std::min_element(results1.begin(), results1.end(),
+		[](const auto& a, const auto& b)
+		{ return a.get_value() < b.get_value(); }))
+		.get_value();
 
-    //minimum 計算 
-        if( i==0 || min2 > value )
-        {
-            min2 = value;
-        }
-    }   
-
-	printf("ave2=%f var2=%f std_dev2=%f max2=%f min2=%f" ,ave2 ,var2 ,std_dev2 ,max2 ,min2);
+	printf("calculate normal\n");
+	printf("ave=%.15f var=%.15f std_dev=%.15f max=%.15f min=%.15f" ,ave2 ,var2 ,std_dev2 ,max2 ,min2);
 
 	//同値確認
-	assert(ave==ave2);
-	assert(var==var2);
-	assert(std_dev==std_dev2);
-	assert(max==max2);
-	assert(min==min2);
+	const unsigned int acc = 1000;		// 10^-n(小数点以下n桁)まで精度を検査
+	assert(std::round(ave*acc) == std::round(ave2*acc));
+	assert(std::round(var*acc) == std::round(var2*acc));
+	assert(std::round(std_dev*acc) == std::round(std_dev2*acc));
+	assert(std::round(max*acc) == std::round(max2*acc));
+	assert(std::round(min*acc) == std::round(min2*acc));
 
 }
