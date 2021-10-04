@@ -34,7 +34,9 @@ protected:
 
 public:
 
-    Result(){}
+    Result()
+    	:value(0.0)
+    {}
 
     Result& set_value(double input)
     { 
