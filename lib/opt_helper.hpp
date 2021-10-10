@@ -8,18 +8,6 @@
 #ifndef LIB_OPT_HELPER_HPP_
 #define LIB_OPT_HELPER_HPP_
 
-
-/*
- * Result.hpp
- *
- *  Created on: 2021/09/25
- *      Author: hommyo
- *
- * This cord is written by UTF-8
- */
-
-#define RESULT_HPP_
-
 #define _USE_MATH_DEFINES
 
 #include <cstdio>
