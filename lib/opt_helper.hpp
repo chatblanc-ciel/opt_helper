@@ -1,3 +1,13 @@
+/*
+ * opt_helper.hpp
+ *
+ *  Created on: 2021/10/10
+ *      Author: matsu
+ */
+
+#ifndef LIB_OPT_HELPER_HPP_
+#define LIB_OPT_HELPER_HPP_
+
 
 /*
  * Result.hpp
@@ -39,9 +49,9 @@ public:
     {}
 
     Result& set_value(double input)
-    { 
+    {
         value = input;
-        return *this; 
+        return *this;
     }
 
     double get_value() const
@@ -68,12 +78,17 @@ public:
     double average() const
     { return ave; }
     double variance() const
-    { return var; }  
+    { return var; }
     double std_deviation() const
     { return std_dev; }
     double maximum() const
     { return max; }
     double minimum() const
-    { return min; }  
+    { return min; }
 
 };
+
+
+
+
+#endif /* LIB_OPT_HELPER_HPP_ */
