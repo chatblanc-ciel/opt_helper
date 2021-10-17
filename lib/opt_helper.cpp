@@ -12,15 +12,18 @@ using namespace std;
 /*
  *  更新曲線
  *  評価値の推移を示す
- *  
- *  tprint_update_curve(ファイルの名前を拡張子込みで入力)
+ * 
+ * # 引数
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
 void Result::tprint_update_curve(const string& file_name) const
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
+    // header 印字
     fprintf(csv, "No,Value\n");
 
+    // 係数値印字
     for(unsigned int i = 0; i < update_value.size(); i++)
     {
         fprintf(csv, "%d,%.15f\n",i + 1 ,update_value.at(i));
@@ -32,23 +35,28 @@ void Result::tprint_update_curve(const string& file_name) const
 /*
  * 更新曲線 画像出力
  *
- * gprint_update_curve(ファイルの名前を拡張子込みで入力)
- * 
+ * # 引数
+ *   file_name :string 出力するファイル名。拡張子を含めること。
+ *   logscale :bool y軸を対数で取るか選択 true:取る false:取らない
  */
 void Result::gprint_update_curve(const string& file_name, bool logscale) const
 {
+    //xrangeの右端を切り上げる
+    unsigned int digit = log10(update_value.size());
+    int xrange = ceil( update_value.size() / pow(10.0, digit) ) * pow(10.0, digit);
+
     //gnuplotで出力
     FILE *gp = popen("gnuplot -persist", "w");
     fprintf(gp, "set terminal pngcairo\n");
     fprintf(gp, "set output '%s'\n" ,file_name.c_str());
     fprintf(gp, "set grid\n");
     fprintf(gp, "set xlabel 'Number of evaluations'\n");
-    fprintf(gp, "set ylabel 'objective function value'\n");
+    fprintf(gp, "set ylabel 'Objective function value'\n");
     fprintf(gp, "set key    font 'Times New Roman,10'\n");
     fprintf(gp, "set xlabel font 'Times New Roman,12'\n");
     fprintf(gp, "set ylabel font 'Times New Roman,12'\n");
     fprintf(gp, "set tics   font 'Times New Roman,10'\n");
-    fprintf(gp, "set xrange [0:%d]\n" ,update_value.size());
+    fprintf(gp, "set xrange [0:%d]\n" ,xrange);
     //fprintf(gp, "set yrange [0:10]\n"); 
     if(logscale)
     {
@@ -66,24 +74,26 @@ void Result::gprint_update_curve(const string& file_name, bool logscale) const
 }
 
 /*
- * 変数の更新経歴
+ * # 変数の更新経歴出力
  * 
- * tprint_update_variable(ファイルの名前を拡張子込みで入力)
+ * 変数の変遷をCSV形式で出力する
  * 
+ * # 引数
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */ 
 void Result::tprint_update_variable(const string& file_name) const
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
+    // header 印字
     fprintf(csv, "No,");
-
     for(unsigned int i = 0; i < update_variable.at(i).size(); i++)
     {
         fprintf(csv, "Variable[%d],",i);
     }
-
     fprintf(csv, "\n");
 
+    // 係数値印字
     for(unsigned int i = 0; i < update_variable.size(); i++)
     {
         fprintf(csv, "%d,",i + 1);
@@ -101,19 +111,21 @@ void Result::tprint_update_variable(const string& file_name) const
  * 最良変数
  * 1試行のなかで最も評価値が良かった時の変数の値を示す。
  * 
- * tprint_variables(ファイルの名前を拡張子込みで入力)
+ * # 引数
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
 void Result::tprint_variable(const string& file_name) const
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
+    // header 印字  
     for(unsigned int i = 0; i < variable.size(); i++)
     {
         fprintf(csv, "Variable[%d],",i);
     }
-
     fprintf(csv, "\n");
 
+    // 係数値印字
     for (unsigned int i = 0; i < variable.size() - 1 ; i++)
     {
         fprintf(csv, "%.15f,",variable.at(i));
@@ -126,27 +138,28 @@ void Result::tprint_variable(const string& file_name) const
 
 /*
  * 開始時の最良変数
- * 1試行の開始時で最も評価値が良かった時の変数の値を示す。
+ * 最適化開始時で最も評価値が良かった時の変数の値を示す。
  * 
- * tprint_variables_first(ファイルの名前を拡張子込みで入力)
+ * # 引数
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
-void Result::tprint_variable_first(const string& file_name) const
+void Result::tprint_init_variable(const string& file_name) const
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
-    for(unsigned int i = 0; i < variable_first.size(); i++)
+    // header 印字
+    for(unsigned int i = 0; i < init_variable.size(); i++)
     {
         fprintf(csv, "Variable[%d],",i);
     }
-
     fprintf(csv, "\n");
 
-    for (unsigned int i = 0; i < variable_first.size() - 1 ; i++)
+    // 係数値印字
+    for (unsigned int i = 0; i < init_variable.size() - 1 ; i++)
     {
-        fprintf(csv, "%.15f,",variable_first.at(i));
+        fprintf(csv, "%.15f,",init_variable.at(i));
     }
-
-    fprintf(csv, "%.15f" ,variable_first.back());
+    fprintf(csv, "%.15f" ,init_variable.back());
 
     fclose(csv);
 }
@@ -156,20 +169,25 @@ void Result::tprint_variable_first(const string& file_name) const
  *  No,Value,Evals,Iter,Time
  *  結果をまとめる関数
  *  
- *  tprint_all_result(全試行分の結果の配列)
+ * # 引数
+ *   results :vector<Result> 全試行分の結果の配列
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
 void Result::tprint_all_result(const vector<Result>& results ,const string& file_name)
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
+    // header 印字
     fprintf(csv, "No,Value,Evals,Iter,Time[ms]\n");
 
+    // 係数値印字
     for(unsigned int i = 0; i < results.size(); i++)
     {
-        fprintf(csv, "%d,%.15f,%.15f,%.15d,%.15f\n"
-        ,i + 1 ,results.at(i).get_value() ,results.at(i).get_evals() 
-        ,results.at(i).get_iter() ,(double)results.at(i).get_time());
+        fprintf(csv, "%d,%.15f,%.15f,%lld,%.15f\n",
+            i + 1, results.at(i).get_value(), results.at(i).get_evals(),
+            results.at(i).get_iter(), (double)results.at(i).get_time());
     }
+
     fclose(csv);
 }
 
@@ -178,21 +196,23 @@ void Result::tprint_all_result(const vector<Result>& results ,const string& file
  *  No,variables
  *  結果をまとめる関数
  *  
- *  tprint_all_variables(全試行分の結果の配列)
+ * # 引数
+ *   results :vector<Result> 全試行分の結果の配列
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
 void Result::tprint_all_variables(const vector<Result>& results ,const string& file_name)
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
+    // header 印字
     fprintf(csv, "No,");
-
     for(unsigned int i = 0; i < results.at(0).get_variable().size(); i++)
     {
         fprintf(csv, "Variable[%d],",i);
     }
-
     fprintf(csv, "\n");
 
+    // 係数値印字
     for(unsigned int i = 0; i < results.size(); i++)
     {
         fprintf(csv, "%d,",i + 1);
@@ -208,10 +228,11 @@ void Result::tprint_all_variables(const vector<Result>& results ,const string& f
 }
 
 /*
- * 統計値計算関数
- * average,variance,stndard_deviation,maxmum,minimum
- *
- * Statistics(統計を計算したい結果の配列)
+ * # 基本統計量についての構造体
+ * 
+ * # コンストラクタ
+ * `Welford online algorithm`による
+ * 計算誤差を低減した基本統計量の計算を行う
  */
 Statistics::Statistics(const vector<Result>& results)
 :ave(0.0), var(0.0), std_dev(0.0), max(0.0), min(0.0), evals_ave(0.0), time_ave(0.0)
@@ -269,25 +290,29 @@ Statistics::Statistics(const vector<Result>& results)
  * 全統計出力関数 
  * No,Average,Max,Min,Std,Variance,EvalsAverage,TimeAverage
  *
- * tprint_all_statistics(全試行分の統計値の配列,ファイルの名前を拡張子込みで入力)
+ * # 引数
+ *   stat :vector<Statistics> 全設計例分の結果の配列
+ *   file_name :string 出力するファイル名。拡張子を含めること。
  */
-void Statistics::tprint_all_statistics(const vector<Statistics>& value ,const string& file_name)
+void Statistics::tprint_all_statistics(const vector<Statistics>& stat ,const string& file_name)
 {
     FILE *csv = fopen(file_name.c_str(),"w");
 
-    unsigned int value_len = value.size();
+    unsigned int stat_len = stat.size();
 
+    // header 印字
     fprintf(csv,"No,Average,Max,Min,Std,Variance,EvalsAverage,TimeAverage[ms]\n");
 
-    for(unsigned int i = 0; i < value_len; ++i)
+    // 係数値印字
+    for(unsigned int i = 0; i < stat_len; ++i)
     {
-        double ave_value = value.at(i).average();
-        double min_value = value.at(i).minimum();
-        double max_value = value.at(i).maximum();
-        double std_value = value.at(i).std_deviation();
-        double var_value = value.at(i).variance();
-        double evals_ave = value.at(i).evals_average();
-        clock_t time_ave = value.at(i).time_average();
+        double ave_value = stat.at(i).average();
+        double min_value = stat.at(i).minimum();
+        double max_value = stat.at(i).maximum();
+        double std_value = stat.at(i).std_deviation();
+        double var_value = stat.at(i).variance();
+        double evals_ave = stat.at(i).evals_average();
+        clock_t time_ave = stat.at(i).time_average();
 
         fprintf(csv,"%d,%.15f,%.15f,%.15f,%.15f,%.15f,%.15f,%.15f\n",
             i + 1, ave_value, max_value, min_value,
