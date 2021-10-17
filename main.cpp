@@ -18,7 +18,7 @@ void test_Statistics_Welfords_online_algorithm();
 void test_tprint_update_curve();
 void test_tprint_update_variable();  
 void test_tprint_variable();
-void test_tprint_variable_first();
+void test_tprint_init_variable();
 void test_gprint_update_curve(); 
 void test_tprint_all_result();
 void test_tprint_all_variables();
@@ -28,14 +28,11 @@ int main(void)
 {
 	printf("example run\n");fflush(0);
 
-	test_tprint_update_curve();
-	//test_tprint_update_variable();
-	//test_tprint_variable();
-	//test_tprint_variable_first();
-	//test_gprint_update_curve();
-	//test_tprint_all_result();
-	//test_tprint_all_variables();
-	//test_tprint_all_statistics();
+	test_gprint_update_curve();
+	test_tprint_update_variable();
+	test_tprint_variable();
+	test_tprint_init_variable();
+	test_tprint_all_variables();
 
 	return 0;
 }
@@ -160,7 +157,7 @@ void test_tprint_variable()
 	variable.tprint_variable("test_variable.csv");
 }
 
-void test_tprint_variable_first()
+void test_tprint_init_variable()
 {
 	vector<double> test;
 
@@ -169,16 +166,16 @@ void test_tprint_variable_first()
 			test.emplace_back(i);
 	}
 
-	Result variable(Result().set_variable_first(test));
+	Result variable(Result().set_init_variable(test));
 
-	variable.tprint_variable_first("test_variable_first.csv");
+	variable.tprint_init_variable("test_init_variable.csv");
 }
 
 void test_gprint_update_curve()
 {
 	vector<double> test;
 
-	for(unsigned int i = 1; i < 20; i ++)
+	for(unsigned int i = 1; i < 4100; i ++)
 	{
 		double t = i * 0.01;
 		test.emplace_back(t);
