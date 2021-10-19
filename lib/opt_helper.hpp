@@ -142,11 +142,16 @@ public:
     double maximum() const
     { return max; }
     double minimum() const
-    { return min; }  
+    { return min; }
     double evals_average() const
-    { return evals_ave; }  
+    { return evals_ave; }
     clock_t time_average() const
-    { return time_ave; } 
+    { return time_ave; }
+    const Result& get_max_result() const
+    { return ref(max_result); }
+    const Result& get_min_result() const
+    { return ref(min_result); }
+
 
     //static function
 
