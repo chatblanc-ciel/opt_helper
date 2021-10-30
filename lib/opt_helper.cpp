@@ -45,17 +45,19 @@ void Result::gprint_update_curve(const string& file_name, bool logscale) const
     unsigned int digit = log10(update_value.size());
     int xrange = ceil( update_value.size() / pow(10.0, digit) ) * pow(10.0, digit);
 
-    //gnuplotで出力
-    FILE *gp = popen("gnuplot -persist", "w");
-    fprintf(gp, "set terminal pngcairo\n");
-    fprintf(gp, "set output '%s'\n" ,file_name.c_str());
-    fprintf(gp, "set grid\n");
+	//gnuplotで出力
+	FILE *gp = popen("gnuplot -persist", "w");
+	fprintf(gp, "set terminal pngcairo size 1280, 960\n");
+	fprintf(gp, "set output '%s'\n", file_name.c_str());
+	fprintf(gp, "set grid\n");
     fprintf(gp, "set xlabel 'Number of evaluations'\n");
     fprintf(gp, "set ylabel 'Objective function value'\n");
-    fprintf(gp, "set key    font 'Times New Roman,10'\n");
-    fprintf(gp, "set xlabel font 'Times New Roman,12'\n");
-    fprintf(gp, "set ylabel font 'Times New Roman,12'\n");
-    fprintf(gp, "set tics   font 'Times New Roman,10'\n");
+	fprintf(gp, "set key    font 'Times New Roman,15'\n");
+	fprintf(gp, "set xlabel font 'Times New Roman,20'\n");
+	fprintf(gp, "set ylabel font 'Times New Roman,20'\n");
+	fprintf(gp, "set tics   font 'Times New Roman,15'\n");
+	fprintf(gp, "set lmargin 20\n");
+	fprintf(gp, "set bmargin 10\n");
     fprintf(gp, "set xrange [0:%d]\n" ,xrange);
     //fprintf(gp, "set yrange [0:10]\n"); 
     if(logscale)

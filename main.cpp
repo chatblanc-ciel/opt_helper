@@ -29,10 +29,6 @@ int main(void)
 	printf("example run\n");fflush(0);
 
 	test_gprint_update_curve();
-	test_tprint_update_variable();
-	test_tprint_variable();
-	test_tprint_init_variable();
-	test_tprint_all_variables();
 
 	return 0;
 }
